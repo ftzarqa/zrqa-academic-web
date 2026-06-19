@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-// TypeScript Interface: Menentukan struktur data dengan ketat
 interface StudentData {
   id: number;
   name: string;
@@ -13,94 +12,228 @@ interface Announcement {
   title: string;
   date: string;
   content: string;
+  tag: string;
+}
+
+interface QuickLink {
+  id: number;
+  icon: string;
+  label: string;
+  desc: string;
+  href: string;
+  accent: boolean;
+}
+
+function useInView(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setInView(true); obs.disconnect(); } },
+      { threshold }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return { ref, inView };
 }
 
 const App: React.FC = () => {
-  // Data statis menggunakan TypeScript tipe StudentData
+  const [mounted, setMounted] = useState(false);
+  const [activeAnn, setActiveAnn] = useState<number | null>(null);
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 50);
+    return () => clearTimeout(t);
+  }, []);
+
   const adminProfile: StudentData = {
     id: 1,
     name: "Lalu Muhammad Iffat Zarqaa",
     nim: "102022500174",
-    role: "Administrator Kelas"
+    role: "Administrator Kelas",
   };
 
-  // State menggunakan React Hooks
   const [announcements] = useState<Announcement[]>([
     {
       id: 1,
       title: "Pengumpulan Tugas Sistem Informasi",
-      date: "2026-06-15",
-      content: "Harap mengumpulkan progres mock-up UI/UX sebelum tenggat waktu."
-    }
+      date: "15 Jun 2026",
+      content: "Harap mengumpulkan progres mock-up UI/UX sebelum tenggat waktu yang telah ditentukan. Pastikan semua aset sudah di-export dengan benar.",
+      tag: "Deadline",
+    },
+    {
+      id: 2,
+      title: "Sesi Review Proyek Akhir",
+      date: "20 Jun 2026",
+      content: "Sesi presentasi dan review bersama dosen pembimbing akan dilaksanakan secara hybrid. Siapkan demo interaktif dari aplikasi Anda.",
+      tag: "Acara",
+    },
+    {
+      id: 3,
+      title: "Update Repositori GitHub Kelas",
+      date: "12 Jun 2026",
+      content: "Template starter untuk tugas minggu ini sudah di-push ke branch main. Clone ulang jika Anda sudah fork sebelumnya.",
+      tag: "Info",
+    },
   ]);
 
+  const quickLinks: QuickLink[] = [
+    { id: 1, icon: "⌥", label: "Repositori GitHub", desc: "Source code & kolaborasi", href: "#", accent: true },
+    { id: 2, icon: "◈", label: "Modul Pembelajaran", desc: "Materi & referensi kelas", href: "#", accent: false },
+    { id: 3, icon: "◇", label: "Zrqa Academic Web", desc: "Portal utama akademik", href: "#", accent: false },
+  ];
+
+  const heroSection = useInView();
+  const annSection = useInView();
+  const profileSection = useInView();
+
+  const initials = adminProfile.name
+    .split(' ')
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('');
+
   return (
-    <div className="min-h-screen bg-slate-100 p-4 md:p-8">
-      {/* Header Section */}
-      <header className="bg-white shadow-sm rounded-xl p-6 mb-6 border-l-4 border-indigo-600 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-800">Portal Kelas SI-49-10</h1>
-          <p className="text-slate-500 mt-1 text-sm md:text-base">Pusat informasi dan manajemen repositori kelas.</p>
+    <div className="zrqa-root">
+      {/* Ambient background orbs */}
+      <div className="orb orb-1" aria-hidden="true" />
+      <div className="orb orb-2" aria-hidden="true" />
+
+      {/* ── HEADER ── */}
+      <header
+        ref={heroSection.ref}
+        className={`hero-header ${mounted && heroSection.inView ? 'is-visible' : ''}`}
+      >
+        <div className="hero-inner">
+          <div className="hero-eyebrow">
+            <span className="badge-pill">Tahun Ajaran 2025/2026</span>
+            <span className="dot-sep" aria-hidden="true" />
+            <span className="eyebrow-text">Lab Zrqa-Acad</span>
+          </div>
+
+          <h1 className="hero-title">
+            <span className="title-line">Portal</span>
+            <span className="title-line accent-line">Zrqa-Acad</span>
+          </h1>
+
+          <p className="hero-sub">
+            Pusat informasi, repositori, dan manajemen kelas — satu tempat untuk semua kebutuhan akademikmu.
+          </p>
+
+          <div className="hero-meta">
+            <span className="meta-chip">
+              <span className="chip-dot" />
+              {announcements.length} Pengumuman aktif
+            </span>
+            <span className="meta-chip">
+              <span className="chip-dot chip-dot--amber" />
+              Semester Genap
+            </span>
+          </div>
         </div>
-        <div className="hidden md:block">
-          <span className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg font-medium">
-            Tahun Ajaran 2025/2026
-          </span>
+
+        <div className="hero-deco" aria-hidden="true">
+          <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="100" r="80" stroke="var(--accent)" strokeWidth="0.5" strokeDasharray="4 6" />
+            <circle cx="100" cy="100" r="55" stroke="var(--accent)" strokeWidth="0.5" opacity="0.5" />
+            <circle cx="100" cy="100" r="8" fill="var(--accent)" opacity="0.8" />
+            <line x1="100" y1="20" x2="100" y2="45" stroke="var(--accent)" strokeWidth="0.8" />
+            <line x1="100" y1="155" x2="100" y2="180" stroke="var(--accent)" strokeWidth="0.8" />
+            <line x1="20" y1="100" x2="45" y2="100" stroke="var(--accent)" strokeWidth="0.8" />
+            <line x1="155" y1="100" x2="180" y2="100" stroke="var(--accent)" strokeWidth="0.8" />
+          </svg>
         </div>
       </header>
 
-      {/* Main Layout Grid */}
-      <main className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Kolom Kiri: Papan Pengumuman */}
-        <section className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-semibold mb-4 text-slate-700 border-b pb-2">Papan Pengumuman</h2>
-          
-          <div className="space-y-4">
-            {announcements.map((item) => (
-              <div key={item.id} className="bg-slate-50 p-4 rounded-lg border border-slate-200 hover:border-indigo-300 transition-colors">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-bold text-slate-800">{item.title}</h3>
-                  <span className="text-xs bg-white px-2 py-1 rounded shadow-sm text-slate-500">{item.date}</span>
+      {/* ── MAIN GRID ── */}
+      <main className="main-grid">
+
+        {/* ── ANNOUNCEMENTS ── */}
+        <section
+          ref={annSection.ref}
+          className={`ann-section ${annSection.inView ? 'is-visible' : ''}`}
+        >
+          <div className="section-header">
+            <h2 className="section-title">Papan Pengumuman</h2>
+            <span className="section-count">{announcements.length}</span>
+          </div>
+
+          <div className="ann-list">
+            {announcements.map((item, i) => (
+              <article
+                key={item.id}
+                className={`ann-card ${activeAnn === item.id ? 'is-open' : ''}`}
+                style={{ animationDelay: `${i * 80}ms` }}
+                onClick={() => setActiveAnn(activeAnn === item.id ? null : item.id)}
+              >
+                <div className="ann-card-top">
+                  <div className="ann-card-left">
+                    <span className={`ann-tag ann-tag--${item.tag.toLowerCase()}`}>{item.tag}</span>
+                    <h3 className="ann-title">{item.title}</h3>
+                  </div>
+                  <div className="ann-card-right">
+                    <time className="ann-date">{item.date}</time>
+                    <span className="ann-chevron" aria-hidden="true">{activeAnn === item.id ? '−' : '+'}</span>
+                  </div>
                 </div>
-                <p className="text-sm text-slate-600">{item.content}</p>
-              </div>
+                <div className="ann-body">
+                  <p className="ann-content">{item.content}</p>
+                </div>
+              </article>
             ))}
           </div>
         </section>
 
-        {/* Kolom Kanan: Profil Admin & Quick Links */}
-        <aside className="space-y-6">
-          {/* Card Profil */}
-          <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col items-center">
-            <div className="w-24 h-24 bg-indigo-600 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-md">
-              {adminProfile.name.charAt(0)}
+        {/* ── SIDEBAR ── */}
+        <aside
+          ref={profileSection.ref}
+          className={`sidebar ${profileSection.inView ? 'is-visible' : ''}`}
+        >
+          {/* Profile Card */}
+          <div className="profile-card">
+            <div className="profile-bg-line" aria-hidden="true" />
+            <div className="avatar" aria-label={`Inisial ${initials}`}>
+              {initials}
+              <span className="avatar-ring" aria-hidden="true" />
             </div>
-            <h3 className="font-bold text-lg text-slate-800 text-center">{adminProfile.name}</h3>
-            <p className="text-sm text-slate-500 font-mono mt-1">{adminProfile.nim}</p>
-            <span className="mt-3 px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">
-              {adminProfile.role}
-            </span>
+            <div className="profile-info">
+              <p className="profile-name">{adminProfile.name}</p>
+              <p className="profile-nim">{adminProfile.nim}</p>
+              <span className="profile-role">{adminProfile.role}</span>
+            </div>
           </div>
 
-          {/* Card Menu Tambahan */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold mb-3 text-slate-700">Akses Cepat</h2>
-            <ul className="space-y-2">
-              <li>
-                <a href="#" className="block px-3 py-2 text-sm text-indigo-600 bg-indigo-50 rounded hover:bg-indigo-100 transition">
-                  📁 Repositori GitHub
-                </a>
-              </li>
-              <li>
-                <a href="#" className="block px-3 py-2 text-sm text-slate-600 bg-slate-50 rounded hover:bg-slate-100 transition">
-                  📚 Modul Pembelajaran
-                </a>
-              </li>
+          {/* Quick Links */}
+          <div className="links-card">
+            <h2 className="links-title">Akses Cepat</h2>
+            <ul className="links-list" role="list">
+              {quickLinks.map((link) => (
+                <li key={link.id}>
+                  <a
+                    href={link.href}
+                    className={`link-item ${link.accent ? 'link-item--accent' : ''}`}
+                  >
+                    <span className="link-icon" aria-hidden="true">{link.icon}</span>
+                    <span className="link-text">
+                      <span className="link-label">{link.label}</span>
+                      <span className="link-desc">{link.desc}</span>
+                    </span>
+                    <span className="link-arrow" aria-hidden="true">→</span>
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
-        </aside>
 
+          {/* Footer tag */}
+          <p className="sidebar-footer">
+            Dipersembahkan oleh<br />
+            <strong>Lab Zrqa Academic-Web</strong>
+          </p>
+        </aside>
       </main>
     </div>
   );
