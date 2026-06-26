@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+/* ══════════════════════════════════════════════════════════
+   ZRQA-ACAD  ·  Global Design Tokens
+   Palette: Deep Dark · Indigo-Violet · Electric Cyan
+══════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Surface Scale ── */
+  --surface-0:  #09090f;
+  --surface-1:  #0f0e1a;
+  --surface-2:  #161429;
+  --surface-3:  #1e1b38;
+  --surface-4:  #272342;
+
+  /* ── Primary — Indigo Violet ── */
+  --clr-primary-950: #0d0b1a;
+  --clr-primary-900: #120f24;
+  --clr-primary-800: #1a1533;
+  --clr-primary-700: #231d47;
+  --clr-primary-600: #3a2f6e;
+  --clr-primary-500: #5b4aaa;
+  --clr-primary-400: #7c68cc;
+  --clr-primary-300: #a492e8;
+  --clr-primary-200: #c8bdf5;
+  --clr-primary-100: #ede9fd;
+
+  /* ── Violet — matches favicon ── */
+  --clr-violet:        #863bff;
+  --clr-violet-light:  #a78bfa;
+  --clr-violet-dim:    rgba(134, 59, 255, 0.15);
+  --clr-violet-glow:   rgba(134, 59, 255, 0.35);
+  --clr-violet-subtle: rgba(134, 59, 255, 0.08);
+
+  /* ── Accent — Electric Cyan ── */
+  --clr-accent:       #06b6d4;
+  --clr-accent-light: #22d3ee;
+  --clr-accent-dim:   rgba(6, 182, 212, 0.12);
+  --clr-accent-glow:  rgba(6, 182, 212, 0.30);
+
+  /* ── Semantic ── */
+  --clr-success:     #10b981;
+  --clr-success-dim: rgba(16, 185, 129, 0.12);
+  --clr-warning:     #f59e0b;
+  --clr-warning-dim: rgba(245, 158, 11, 0.12);
+  --clr-error:       #ef4444;
+  --clr-error-dim:   rgba(239, 68, 68, 0.12);
+  --clr-info:        #3b82f6;
+  --clr-info-dim:    rgba(59, 130, 246, 0.12);
+
+  /* ── Text Scale ── */
+  --text-1: #f8f7ff;
+  --text-2: #b8b4d0;
+  --text-3: #6b6589;
+  --text-4: #3d3860;
+
+  /* ── Borders ── */
+  --border-1:      rgba(255, 255, 255, 0.06);
+  --border-2:      rgba(255, 255, 255, 0.12);
+  --border-accent: rgba(134, 59, 255, 0.30);
+  --border-cyan:   rgba(6, 182, 212, 0.25);
+
+  /* ── Spacing (4px base) ── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* ── Border Radius ── */
+  --radius-xs:   4px;
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-2xl:  32px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+  --shadow-xl: 0 16px 48px rgba(0,0,0,0.6);
+  --shadow-glow-violet: 0 0 40px rgba(134,59,255,0.25), 0 0 80px rgba(134,59,255,0.08);
+  --shadow-glow-cyan:   0 0 40px rgba(6,182,212,0.20),  0 0 80px rgba(6,182,212,0.06);
+
+  /* ── Easings ── */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Typography ── */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+
+  /* ── Tag colors (preserved from original) ── */
+  --tag-deadline-bg:  rgba(224, 76, 76, 0.12);
+  --tag-deadline-col: #e07070;
+  --tag-acara-bg:     rgba(100, 160, 230, 0.12);
+  --tag-acara-col:    #7ab4e8;
+  --tag-info-bg:      rgba(100, 200, 150, 0.12);
+  --tag-info-col:     #7ecba0;
+}
+
+/* ── Reset / Base ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--surface-0);
+  color: var(--text-1);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+img, video, svg { max-width: 100%; height: auto; display: block; }
+a { text-decoration: none; color: inherit; }
+ul, ol { list-style: none; }
+button { cursor: pointer; border: none; background: none; font: inherit; }
+
+/* ── Skip Link (accessibility) ── */
+.skip-link {
+  position: fixed;
+  top: -100%;
+  left: var(--space-4);
+  background: var(--clr-violet);
+  color: #fff;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.875rem;
+  z-index: 9999;
+  transition: top 0.2s;
+}
+.skip-link:focus { top: var(--space-4); }
