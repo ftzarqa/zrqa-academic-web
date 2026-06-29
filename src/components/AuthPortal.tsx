@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface AuthPortalProps {
   onSuccess?: () => void;
@@ -8,7 +8,6 @@ interface AuthPortalProps {
 
 type AuthMode = 'login' | 'register';
 
-const SPRING_SNAPPY = { type: 'spring', stiffness: 400, damping: 25 } as const;
 const SPRING_SMOOTH = { type: 'spring', stiffness: 300, damping: 28 } as const;
 const SPRING_BOUNCY = { type: 'spring', stiffness: 500, damping: 15 } as const;
 
