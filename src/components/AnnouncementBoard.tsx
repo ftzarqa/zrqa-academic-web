@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from '../hooks/useInView';
+
+const SPRING_SNAPPY = { type: "spring" as const, stiffness: 400, damping: 25 };
+const SPRING_HOVER = { type: "spring" as const, stiffness: 500, damping: 30 };
+const SPRING_GENTLE = { type: "spring" as const, stiffness: 300, damping: 28 };
 
 export interface Announcement {
   id:      number;
@@ -12,6 +17,24 @@ export interface Announcement {
 interface AnnouncementBoardProps {
   announcements: Announcement[];
 }
+
+const listVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08 },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: SPRING_SNAPPY,
+  },
+};
 
 const AnnouncementBoard: React.FC<AnnouncementBoardProps> = ({ announcements }) => {
   const { ref, inView } = useInView({ threshold: 0.1 });
@@ -36,15 +59,22 @@ const AnnouncementBoard: React.FC<AnnouncementBoardProps> = ({ announcements }) 
         </span>
       </div>
 
-      <div className="ann-list" role="list">
-        {announcements.map((item, i) => {
+      <motion.div
+        className="ann-list"
+        role="list"
+        variants={listVariants}
+        initial="hidden"
+        animate={inView ? 'visible' : 'hidden'}
+      >
+        {announcements.map((item) => {
           const isOpen = activeId === item.id;
           return (
-            <article
+            <motion.article
               key={item.id}
               className={`ann-card ${isOpen ? 'is-open' : ''}`}
-              style={{ animationDelay: `${i * 80}ms` }}
               role="listitem"
+              variants={cardVariants}
+              whileHover={{ scale: 1.01, transition: SPRING_HOVER }}
             >
               <button
                 className="ann-card-toggle"
@@ -70,19 +100,26 @@ const AnnouncementBoard: React.FC<AnnouncementBoardProps> = ({ announcements }) 
                 </div>
               </button>
 
-              <div
-                id={`ann-body-${item.id}`}
-                className="ann-body"
-                role="region"
-                aria-labelledby={`ann-btn-${item.id}`}
-                aria-hidden={!isOpen}
-              >
-                <p className="ann-content">{item.content}</p>
-              </div>
-            </article>
+              <AnimatePresence initial={false}>
+                {isOpen && (
+                  <motion.div
+                    id={`ann-body-${item.id}`}
+                    className="ann-body"
+                    role="region"
+                    aria-labelledby={`ann-btn-${item.id}`}
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1, transition: SPRING_GENTLE }}
+                    exit={{ height: 0, opacity: 0, transition: { duration: 0.2 } }}
+                    style={{ overflow: "hidden" }}
+                  >
+                    <p className="ann-content">{item.content}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.article>
           );
         })}
-      </div>
+      </motion.div>
     </section>
   );
 };

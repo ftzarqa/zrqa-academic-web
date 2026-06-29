@@ -1,5 +1,9 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { useInView } from '../hooks/useInView';
+
+const SPRING_SNAPPY = { type: "spring" as const, stiffness: 400, damping: 25 };
+const SPRING_HOVER = { type: "spring" as const, stiffness: 500, damping: 30 };
 
 interface Feature {
   id:    number;
@@ -54,6 +58,24 @@ const FEATURES: Feature[] = [
   },
 ];
 
+const gridVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08 },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 24, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: SPRING_SNAPPY,
+  },
+};
+
 const Features: React.FC = () => {
   const { ref, inView } = useInView({ threshold: 0.1 });
 
@@ -80,13 +102,20 @@ const Features: React.FC = () => {
         </div>
 
         {/* Feature grid */}
-        <div className="features-grid" role="list">
-          {FEATURES.map((feat, i) => (
-            <article
+        <motion.div
+          className="features-grid"
+          role="list"
+          variants={gridVariants}
+          initial="hidden"
+          animate={inView ? 'visible' : 'hidden'}
+        >
+          {FEATURES.map((feat) => (
+            <motion.article
               key={feat.id}
               className={`feature-card feature-card--${feat.color}`}
-              style={{ animationDelay: `${i * 80}ms` }}
               role="listitem"
+              variants={cardVariants}
+              whileHover={{ y: -8, transition: SPRING_HOVER }}
             >
               <div className={`feature-icon-wrap feature-icon-wrap--${feat.color}`} aria-hidden="true">
                 <span className="feature-icon">{feat.icon}</span>
@@ -94,9 +123,9 @@ const Features: React.FC = () => {
               <h3 className="feature-title">{feat.title}</h3>
               <p className="feature-desc">{feat.desc}</p>
               <span className="feature-arrow" aria-hidden="true">→</span>
-            </article>
+            </motion.article>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useInView } from '../hooks/useInView';
+
+const SPRING_SNAPPY = { type: "spring" as const, stiffness: 400, damping: 25 };
+const SPRING_HOVER = { type: "spring" as const, stiffness: 500, damping: 30 };
 
 interface StatItem {
   id:          number;
@@ -77,6 +81,24 @@ function AnimatedCounter({ target, suffix, inView }: AnimatedCounterProps) {
   );
 }
 
+const gridVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 24, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: SPRING_SNAPPY,
+  },
+};
+
 const Stats: React.FC = () => {
   const { ref, inView } = useInView({ threshold: 0.2 });
 
@@ -100,13 +122,20 @@ const Stats: React.FC = () => {
           </p>
         </div>
 
-        <div className="stats-grid" role="list">
-          {STATS.map((stat, i) => (
-            <div
+        <motion.div
+          className="stats-grid"
+          role="list"
+          variants={gridVariants}
+          initial="hidden"
+          animate={inView ? 'visible' : 'hidden'}
+        >
+          {STATS.map((stat) => (
+            <motion.div
               key={stat.id}
               className={`stat-card stat-card--${stat.color}`}
-              style={{ animationDelay: `${i * 100}ms` }}
               role="listitem"
+              variants={cardVariants}
+              whileHover={{ y: -6, transition: SPRING_HOVER }}
             >
               <div className={`stat-number stat-number--${stat.color}`}>
                 {inView
@@ -116,9 +145,9 @@ const Stats: React.FC = () => {
               </div>
               <p className="stat-label">{stat.label}</p>
               <p className="stat-description">{stat.description}</p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

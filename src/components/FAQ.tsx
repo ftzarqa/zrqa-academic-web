@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from '../hooks/useInView';
+
+const SPRING_SNAPPY = { type: "spring" as const, stiffness: 400, damping: 25 };
+const SPRING_GENTLE = { type: "spring" as const, stiffness: 300, damping: 28 };
 
 interface FAQItem {
   id:       number;
@@ -40,6 +44,24 @@ const FAQ_ITEMS: FAQItem[] = [
   },
 ];
 
+const listVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20, scale: 0.97 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: SPRING_SNAPPY,
+  },
+};
+
 const FAQ: React.FC = () => {
   const { ref, inView } = useInView({ threshold: 0.1 });
   const [openId, setOpenId] = useState<number | null>(null);
@@ -66,15 +88,21 @@ const FAQ: React.FC = () => {
           </p>
         </div>
 
-        <div className="faq-list" role="list">
-          {FAQ_ITEMS.map((item, i) => {
+        <motion.div
+          className="faq-list"
+          role="list"
+          variants={listVariants}
+          initial="hidden"
+          animate={inView ? 'visible' : 'hidden'}
+        >
+          {FAQ_ITEMS.map((item) => {
             const isOpen = openId === item.id;
             return (
-              <div
+              <motion.div
                 key={item.id}
                 className={`faq-item ${isOpen ? 'is-open' : ''}`}
-                style={{ animationDelay: `${i * 60}ms` }}
                 role="listitem"
+                variants={itemVariants}
               >
                 <button
                   className="faq-question"
@@ -84,27 +112,37 @@ const FAQ: React.FC = () => {
                   id={`faq-question-${item.id}`}
                 >
                   <span className="faq-question-text">{item.question}</span>
-                  <span
+                  <motion.span
                     className={`faq-chevron ${isOpen ? 'faq-chevron--open' : ''}`}
                     aria-hidden="true"
+                    animate={{ rotate: isOpen ? 45 : 0 }}
+                    transition={SPRING_SNAPPY}
                   >
                     +
-                  </span>
+                  </motion.span>
                 </button>
 
-                <div
-                  id={`faq-answer-${item.id}`}
-                  className="faq-answer"
-                  role="region"
-                  aria-labelledby={`faq-question-${item.id}`}
-                  aria-hidden={!isOpen}
-                >
-                  <p className="faq-answer-text">{item.answer}</p>
-                </div>
-              </div>
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      id={`faq-answer-${item.id}`}
+                      className="faq-answer"
+                      role="region"
+                      aria-labelledby={`faq-question-${item.id}`}
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={SPRING_GENTLE}
+                      style={{ overflow: "hidden" }}
+                    >
+                      <p className="faq-answer-text">{item.answer}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

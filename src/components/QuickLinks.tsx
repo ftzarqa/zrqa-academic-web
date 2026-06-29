@@ -1,4 +1,8 @@
 import React from 'react';
+import { motion } from 'framer-motion';
+
+const SPRING_SNAPPY = { type: "spring" as const, stiffness: 400, damping: 25 };
+const SPRING_HOVER = { type: "spring" as const, stiffness: 500, damping: 30 };
 
 export interface QuickLink {
   id:     number;
@@ -13,13 +17,40 @@ interface QuickLinksProps {
   links: QuickLink[];
 }
 
+const listVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -10 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: SPRING_SNAPPY,
+  },
+};
+
 const QuickLinks: React.FC<QuickLinksProps> = ({ links }) => {
   return (
     <div className="quicklinks-card">
       <h2 className="quicklinks-heading">Akses Cepat</h2>
-      <ul className="quicklinks-list" role="list">
+      <motion.ul
+        className="quicklinks-list"
+        role="list"
+        variants={listVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {links.map(link => (
-          <li key={link.id}>
+          <motion.li
+            key={link.id}
+            variants={itemVariants}
+            whileHover={{ x: 6, transition: SPRING_HOVER }}
+          >
             <a
               href={link.href}
               className={`quicklink-item ${link.accent ? 'quicklink-item--accent' : ''}`}
@@ -35,9 +66,9 @@ const QuickLinks: React.FC<QuickLinksProps> = ({ links }) => {
               </span>
               <span className="quicklink-arrow" aria-hidden="true">→</span>
             </a>
-          </li>
+          </motion.li>
         ))}
-      </ul>
+      </motion.ul>
     </div>
   );
 };

@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from '../hooks/useInView';
+
+const SPRING_SNAPPY = { type: "spring" as const, stiffness: 400, damping: 25 };
+const SPRING_HOVER = { type: "spring" as const, stiffness: 500, damping: 30 };
 
 interface Testimonial {
   id:      number;
@@ -108,67 +112,80 @@ const Testimonials: React.FC = () => {
 
         {/* Carousel */}
         <div className="testimonial-carousel" aria-live="polite" aria-atomic="true">
-          {TESTIMONIALS.map((t, i) => (
-            <article
-              key={t.id}
-              className={`testimonial-card testimonial-card--${t.color} ${i === active ? 'is-active' : ''}`}
-              aria-hidden={i !== active}
-              aria-label={`Testimoni dari ${t.name}`}
-            >
-              <StarRating rating={t.rating} />
-              <blockquote className="testimonial-quote">
-                <p>"{t.quote}"</p>
-              </blockquote>
-              <footer className="testimonial-author">
-                <div
-                  className={`testimonial-avatar testimonial-avatar--${t.color}`}
-                  aria-hidden="true"
-                >
-                  {t.initials}
-                </div>
-                <div className="testimonial-meta">
-                  <p className="testimonial-name">{t.name}</p>
-                  <p className="testimonial-detail">
-                    <span className="testimonial-nim">{t.nim}</span>
-                    <span className="testimonial-sep" aria-hidden="true">·</span>
-                    <span>{t.role}</span>
-                  </p>
-                </div>
-              </footer>
-            </article>
-          ))}
+          <AnimatePresence mode="wait">
+            {TESTIMONIALS.filter((_, i) => i === active).map((t) => (
+              <motion.article
+                key={t.id}
+                className={`testimonial-card testimonial-card--${t.color} is-active`}
+                aria-label={`Testimoni dari ${t.name}`}
+                initial={{ opacity: 0, x: 30, scale: 0.97 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -30, scale: 0.97 }}
+                transition={SPRING_SNAPPY}
+              >
+                <StarRating rating={t.rating} />
+                <blockquote className="testimonial-quote">
+                  <p>"{t.quote}"</p>
+                </blockquote>
+                <footer className="testimonial-author">
+                  <div
+                    className={`testimonial-avatar testimonial-avatar--${t.color}`}
+                    aria-hidden="true"
+                  >
+                    {t.initials}
+                  </div>
+                  <div className="testimonial-meta">
+                    <p className="testimonial-name">{t.name}</p>
+                    <p className="testimonial-detail">
+                      <span className="testimonial-nim">{t.nim}</span>
+                      <span className="testimonial-sep" aria-hidden="true">·</span>
+                      <span>{t.role}</span>
+                    </p>
+                  </div>
+                </footer>
+              </motion.article>
+            ))}
+          </AnimatePresence>
         </div>
 
         {/* Dots navigation */}
         <div className="testimonial-dots" role="tablist" aria-label="Pilih testimoni">
           {TESTIMONIALS.map((t, i) => (
-            <button
+            <motion.button
               key={t.id}
               className={`testimonial-dot ${i === active ? 'is-active' : ''}`}
               onClick={() => goTo(i)}
               role="tab"
               aria-selected={i === active}
               aria-label={`Testimoni ${i + 1}: ${t.name}`}
+              animate={{ scale: i === active ? 1.1 : 1 }}
+              transition={SPRING_HOVER}
             />
           ))}
         </div>
 
         {/* Navigation arrows */}
         <div className="testimonial-nav" aria-label="Navigasi testimoni">
-          <button
+          <motion.button
             className="testimonial-nav-btn"
             onClick={() => setActive(prev => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length)}
             aria-label="Testimoni sebelumnya"
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.95 }}
+            transition={SPRING_HOVER}
           >
             ←
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             className="testimonial-nav-btn"
             onClick={goToNext}
             aria-label="Testimoni berikutnya"
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.95 }}
+            transition={SPRING_HOVER}
           >
             →
-          </button>
+          </motion.button>
         </div>
       </div>
     </section>

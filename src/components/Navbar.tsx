@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const SPRING_GENTLE = { type: "spring" as const, stiffness: 300, damping: 28 };
+const SPRING_HOVER = { type: "spring" as const, stiffness: 500, damping: 30 };
 
 interface NavLink {
   href: string;
@@ -38,7 +42,13 @@ const Navbar: React.FC = () => {
     >
       <div className="navbar-inner">
         {/* ── Logo ── */}
-        <a href="#" className="nav-logo" aria-label="Zrqa-Acad — kembali ke beranda">
+        <motion.a
+          href="#"
+          className="nav-logo"
+          aria-label="Zrqa-Acad — kembali ke beranda"
+          whileHover={{ scale: 1.03 }}
+          transition={SPRING_HOVER}
+        >
           <svg
             className="nav-logo-icon"
             width="26"
@@ -62,7 +72,7 @@ const Navbar: React.FC = () => {
             <span className="nav-wordmark-bold">Zrqa</span>
             <span className="nav-wordmark-accent">-Acad</span>
           </span>
-        </a>
+        </motion.a>
 
         {/* ── Desktop Nav Links ── */}
         <nav aria-label="Menu utama">
@@ -79,10 +89,17 @@ const Navbar: React.FC = () => {
 
         {/* ── Desktop CTA + Hamburger ── */}
         <div className="nav-actions">
-          <a href="#pengumuman" className="btn btn-primary btn-sm" id="nav-cta">
+          <motion.a
+            href="#pengumuman"
+            className="btn btn-primary btn-sm"
+            id="nav-cta"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
+            transition={SPRING_HOVER}
+          >
             Masuk Portal
             <span className="btn-icon" aria-hidden="true">→</span>
-          </a>
+          </motion.a>
 
           <button
             className={`hamburger ${menuOpen ? 'is-open' : ''}`}
@@ -99,39 +116,47 @@ const Navbar: React.FC = () => {
       </div>
 
       {/* ── Mobile Menu ── */}
-      <div
-        id="mobile-menu"
-        className={`mobile-menu ${menuOpen ? 'is-open' : ''}`}
-        aria-hidden={!menuOpen}
-      >
-        <nav aria-label="Menu mobile">
-          <ul role="list">
-            {NAV_LINKS.map(link => (
-              <li key={link.href}>
-                <a
-                  href={link.href}
-                  className="mobile-nav-link"
-                  onClick={handleMobileLinkClick}
-                  tabIndex={menuOpen ? 0 : -1}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-            <li>
-              <a
-                href="#pengumuman"
-                className="btn btn-primary"
-                style={{ display: 'flex', width: '100%', justifyContent: 'center' }}
-                onClick={handleMobileLinkClick}
-                tabIndex={menuOpen ? 0 : -1}
-              >
-                Masuk Portal →
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </div>
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            id="mobile-menu"
+            className="mobile-menu is-open"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={SPRING_GENTLE}
+            style={{ overflow: "hidden" }}
+          >
+            <nav aria-label="Menu mobile">
+              <ul role="list">
+                {NAV_LINKS.map(link => (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      className="mobile-nav-link"
+                      onClick={handleMobileLinkClick}
+                      tabIndex={menuOpen ? 0 : -1}
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+                <li>
+                  <a
+                    href="#pengumuman"
+                    className="btn btn-primary"
+                    style={{ display: 'flex', width: '100%', justifyContent: 'center' }}
+                    onClick={handleMobileLinkClick}
+                    tabIndex={menuOpen ? 0 : -1}
+                  >
+                    Masuk Portal →
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };

@@ -1,5 +1,8 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { useInView } from '../hooks/useInView';
+
+const SPRING_SNAPPY = { type: "spring" as const, stiffness: 400, damping: 25 };
 
 interface Benefit {
   id:       number;
@@ -53,6 +56,23 @@ const BENEFITS: Benefit[] = [
   },
 ];
 
+const pointsContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08 },
+  },
+};
+
+const pointVariants = {
+  hidden: { opacity: 0, x: -12 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: SPRING_SNAPPY,
+  },
+};
+
 interface BenefitRowProps {
   benefit: Benefit;
   index:   number;
@@ -61,6 +81,9 @@ interface BenefitRowProps {
 function BenefitRow({ benefit, index }: BenefitRowProps) {
   const { ref, inView } = useInView({ threshold: 0.15, delay: 50 });
 
+  const contentX = benefit.reverse ? 40 : -40;
+  const visualX = benefit.reverse ? -40 : 40;
+
   return (
     <div
       ref={ref}
@@ -68,22 +91,39 @@ function BenefitRow({ benefit, index }: BenefitRowProps) {
       style={{ transitionDelay: `${index * 60}ms` }}
     >
       {/* Text Side */}
-      <div className="benefit-content">
+      <motion.div
+        className="benefit-content"
+        initial={{ opacity: 0, x: contentX }}
+        animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: contentX }}
+        transition={{ ...SPRING_SNAPPY, delay: 0.05 }}
+      >
         <span className="section-badge">{benefit.badge}</span>
         <h3 className="benefit-title">{benefit.title}</h3>
         <p className="benefit-subtitle">{benefit.subtitle}</p>
-        <ul className="benefit-points" role="list">
+        <motion.ul
+          className="benefit-points"
+          role="list"
+          variants={pointsContainerVariants}
+          initial="hidden"
+          animate={inView ? 'visible' : 'hidden'}
+        >
           {benefit.points.map((pt, i) => (
-            <li key={i} className="benefit-point">
+            <motion.li key={i} className="benefit-point" variants={pointVariants}>
               <span className="benefit-check" aria-hidden="true">✓</span>
               <span>{pt}</span>
-            </li>
+            </motion.li>
           ))}
-        </ul>
-      </div>
+        </motion.ul>
+      </motion.div>
 
       {/* Visual Side */}
-      <div className="benefit-visual" aria-hidden="true">
+      <motion.div
+        className="benefit-visual"
+        aria-hidden="true"
+        initial={{ opacity: 0, x: visualX }}
+        animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: visualX }}
+        transition={{ ...SPRING_SNAPPY, delay: 0.15 }}
+      >
         <div className="benefit-card-demo">
           <div className="benefit-icon-display">
             <span className="benefit-big-icon">{benefit.icon}</span>
@@ -94,7 +134,7 @@ function BenefitRow({ benefit, index }: BenefitRowProps) {
             <span className="demo-line demo-line--short" />
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

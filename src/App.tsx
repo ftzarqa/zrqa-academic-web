@@ -1,22 +1,28 @@
 import React from 'react';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
-import Navbar            from './components/Navbar';
-import Hero              from './components/Hero';
-import Features          from './components/Features';
-import Stats             from './components/Stats';
-import Benefits          from './components/Benefits';
-import Testimonials      from './components/Testimonials';
-import FAQ               from './components/FAQ';
+// ── Import Komponen Landing Page ──
 import AnnouncementBoard from './components/AnnouncementBoard';
-import ProfileCard       from './components/ProfileCard';
-import QuickLinks        from './components/QuickLinks';
-import Footer            from './components/Footer';
+import Benefits from './components/Benefits';
+import FAQ from './components/FAQ';
+import Features from './components/Features';
+import Footer from './components/Footer';
+import Hero from './components/Hero';
+import Navbar from './components/Navbar';
+import ProfileCard from './components/ProfileCard';
+import QuickLinks from './components/QuickLinks';
+import Stats from './components/Stats';
+import Testimonials from './components/Testimonials';
 
-import type { Announcement }  from './components/AnnouncementBoard';
-import type { StudentData }   from './components/ProfileCard';
-import type { QuickLink }     from './components/QuickLinks';
+// ── Import Halaman Baru ──
+import AuthPortal from './components/AuthPortal';
 
-/* ── Static Data (preserved from original) ── */
+// ── Types ──
+import type { Announcement } from './components/AnnouncementBoard';
+import type { StudentData } from './components/ProfileCard';
+import type { QuickLink } from './components/QuickLinks';
+
+/* ── Static Data ── */
 
 const ADMIN_PROFILE: StudentData = {
   id:   1,
@@ -76,36 +82,19 @@ const QUICK_LINKS: QuickLink[] = [
   },
 ];
 
-/* ── App ── */
-
-const App: React.FC = () => {
+/* ── Komponen Halaman Utama (Landing Page) ── */
+const LandingPage: React.FC = () => {
   return (
     <div className="app-root">
-      {/* ── Navigation ── */}
       <Navbar />
-
-      {/* ── Main content ── */}
       <main id="main-content">
-
-        {/* 1. Hero */}
         <Hero />
-
-        {/* 2. Features */}
         <Features />
-
-        {/* 3. Statistics */}
         <Stats />
-
-        {/* 4. Benefits */}
         <Benefits />
-
-        {/* 5. Testimonials */}
         <Testimonials />
-
-        {/* 6. FAQ */}
         <FAQ />
-
-        {/* 7. Dashboard section (announcements + profile + links) */}
+        
         <section
           id="pengumuman"
           className="dashboard-section"
@@ -123,12 +112,10 @@ const App: React.FC = () => {
             </div>
 
             <div className="dashboard-grid">
-              {/* Announcement board */}
               <div className="dashboard-main">
                 <AnnouncementBoard announcements={ANNOUNCEMENTS} />
               </div>
 
-              {/* Sidebar */}
               <aside className="dashboard-sidebar" aria-label="Informasi profil dan tautan cepat">
                 <ProfileCard profile={ADMIN_PROFILE} />
                 <QuickLinks links={QUICK_LINKS} />
@@ -140,12 +127,24 @@ const App: React.FC = () => {
             </div>
           </div>
         </section>
-
       </main>
-
-      {/* ── Footer ── */}
       <Footer />
     </div>
+  );
+};
+
+/* ── App (Pengatur Routing Utama) ── */
+const App: React.FC = () => {
+  return (
+    <Router>
+      <Routes>
+        {/* Route default akan menampilkan LandingPage */}
+        <Route path="/" element={<LandingPage />} />
+        
+        {/* Route /masuk akan merender UI Login yang baru */}
+        <Route path="/masuk" element={<AuthPortal />} />
+      </Routes>
+    </Router>
   );
 };
 
